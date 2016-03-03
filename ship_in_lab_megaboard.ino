@@ -64,7 +64,7 @@ sensors_event_t compass_event;
 
 // Setup motor controllers for both drive and steering (turn).   
 /*Adafruit_DCMotor *turnMotor = AFMS.getMotor(1);
-Adafruit_DCMotor *driveMotor = AFMS.getMotor(3);*/
+  Adafruit_DCMotor *driveMotor = AFMS.getMotor(3);*/
 #define TURN_LEFT 1
 #define TURN_RIGHT 179
 #define TURN_STRAIGHT 90
@@ -148,10 +148,10 @@ int spd = NORMAL_SPEED;
 
 // IR Receiver
 #ifdef USE_IR
-  #include "IRremote.h"            // IR remote
-  #define IR_PIN 44
-  IRrecv IR_receiver(IR_PIN);           // create instance of 'irrecv'
-  decode_results IR_results;            // create instance of 'decode_results'
+#include "IRremote.h"            // IR remote
+#define IR_PIN 44
+IRrecv IR_receiver(IR_PIN);           // create instance of 'irrecv'
+decode_results IR_results;            // create instance of 'decode_results'
 #endif
 
 
@@ -177,14 +177,14 @@ int spd = NORMAL_SPEED;
 #define IR_CODE_8 0xFD9867
 #define IR_CODE_9 0xFD58A7
 #define IR_CODE_0 0xFD30CF     
-    
+
 
 
 // 
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) 
 {
-  GPS.read();
+    GPS.read();
 }
 
 
@@ -192,124 +192,124 @@ SIGNAL(TIMER0_COMPA_vect)
 // turn interrupt on and off
 void useInterrupt(boolean v) 
 {
-  if (v) {
-    // Timer0 is already used for millis() - we'll just interrupt somewhere
-    // in the middle and call the "Compare A" function above
-    OCR0A = 0xAF;
-    TIMSK0 |= _BV(OCIE0A);
-    usingInterrupt = true;
-  } else {
-    // do not call the interrupt function COMPA anymore
-    TIMSK0 &= ~_BV(OCIE0A);
-    usingInterrupt = false;
-  }
+    if (v) {
+        // Timer0 is already used for millis() - we'll just interrupt somewhere
+        // in the middle and call the "Compare A" function above
+        OCR0A = 0xAF;
+        TIMSK0 |= _BV(OCIE0A);
+        usingInterrupt = true;
+    } else {
+        // do not call the interrupt function COMPA anymore
+        TIMSK0 &= ~_BV(OCIE0A);
+        usingInterrupt = false;
+    }
 }
 
-  
+
 void setup() 
 {
-  
-Direction.attach(10);
-Direction.write(0);
-pinMode (drive_motor,OUTPUT);
-pinMode (inv_drive_motor,OUTPUT);
-  // turn on serial monitor 
-  Serial.begin(115200);        // we need this speed for the GPS
+
+    Direction.attach(10);
+    Direction.write(0);
+    pinMode (drive_motor,OUTPUT);
+    pinMode (inv_drive_motor,OUTPUT);
+    // turn on serial monitor 
+    Serial.begin(115200);        // we need this speed for the GPS
 
 
-  //
-  // Start LCD display
-  lcd.begin();            // start the LCD...new version doesn't require size startup parameters
-  #ifdef USE_LCD_BACKLIGHT
+    //
+    // Start LCD display
+    lcd.begin();            // start the LCD...new version doesn't require size startup parameters
+#ifdef USE_LCD_BACKLIGHT
     lcd.backlight();
-  #else
+#else
     lcd.noBacklight();      
-  #endif
-  lcd.clear();
-  #ifdef USE_GRAPHING
-     createLCDChars();  // initialize LCD with graphing characters
-  #endif
+#endif
+    lcd.clear();
+#ifdef USE_GRAPHING
+    createLCDChars();  // initialize LCD with graphing characters
+#endif
 
 
-  //
-  /*
-  // Start motor drives
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  driveMotor->setSpeed(NORMAL_SPEED);      
-  turnMotor->setSpeed(255);                // full turn; only option with current RC car chassis
+    //
+    /*
+    // Start motor drives
+    AFMS.begin();  // create with the default frequency 1.6KHz
 
-*/
-  //
-  // start Mag / Compass
-  if(!compass.begin())
+    // Set the speed to start, from 0 (off) to 255 (max speed)
+    driveMotor->setSpeed(NORMAL_SPEED);      
+    turnMotor->setSpeed(255);                // full turn; only option with current RC car chassis
+
+     */
+    //
+    // start Mag / Compass
+    if(!compass.begin())
     {
-      #ifdef DEBUG
+#ifdef DEBUG
         Serial.println(F("COMPASS ERROR"));
-      #endif
-      lcd.print(F("COMPASS ERROR"));
-      loopForever();         // loop forever, can't operate without compass
+#endif
+        lcd.print(F("COMPASS ERROR"));
+        loopForever();         // loop forever, can't operate without compass
     }
     lcd.setCursor(0, 1);
-  lcd.print(F("COMPASS OK"));
-  delay(1000);
+    lcd.print(F("COMPASS OK"));
+    delay(1000);
 
-  //
-  // start GPS and set desired configuration
-  GPS.begin(9600);                                // 9600 NMEA default speed
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);     // turns on RMC and GGA (fix data)
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);       // 1 Hz update rate
-  GPS.sendCommand(PGCMD_NOANTENNA);                // turn off antenna status info
-  useInterrupt(true);                            // use interrupt to constantly pull data from GPS
-  delay(1000);
-      
-  //
-  // Wait for GPS to get signal
-  #ifndef NO_GPS_WAIT
-  lcd.setCursor(0, 0);
-  lcd.print(F("Waiting for GPS"));
-  unsigned long startTime = millis();
-  while (!GPS.fix)                      // wait for fix, updating display with each new NMEA sentence received
+    //
+    // start GPS and set desired configuration
+    GPS.begin(9600);                                // 9600 NMEA default speed
+    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);     // turns on RMC and GGA (fix data)
+    GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);       // 1 Hz update rate
+    GPS.sendCommand(PGCMD_NOANTENNA);                // turn off antenna status info
+    useInterrupt(true);                            // use interrupt to constantly pull data from GPS
+    delay(1000);
+
+    //
+    // Wait for GPS to get signal
+#ifndef NO_GPS_WAIT
+    lcd.setCursor(0, 0);
+    lcd.print(F("Waiting for GPS"));
+    unsigned long startTime = millis();
+    while (!GPS.fix)                      // wait for fix, updating display with each new NMEA sentence received
     {
-      lcd.setCursor(0, 1);
-      lcd.print(F("Wait Time: "));
-      lcd.print((int) (millis() - startTime) / 1000);     // show how long we have waited  
-      if (GPS.newNMEAreceived())
-        GPS.parse(GPS.lastNMEA());      
+        lcd.setCursor(0, 1);
+        lcd.print(F("Wait Time: "));
+        lcd.print((int) (millis() - startTime) / 1000);     // show how long we have waited  
+        if (GPS.newNMEAreceived())
+            GPS.parse(GPS.lastNMEA());      
     } // while (!GPS.fix)
-  //delay(1000);
+    //delay(1000);
 #endif
-  
 
-  //   
-  // Start the IR receiver
-  #ifdef USE_IR
+
+    //   
+    // Start the IR receiver
+#ifdef USE_IR
     IR_receiver.enableIRIn(); // Start the receiver
     // Wait for operator to press key to start moving
     lcd.setCursor(0, 3);
     lcd.print(F("Press key to start"));  
     while(!IR_receiver.decode(&IR_results)) ;   // wait for key press
-        /*  if (IR_results.value==IR_CODE_0) {
-      lcd.clear();
-      
-    lcd.print(F("config_moteur"));
-    Drive.writeMicroseconds(FAST_SPEED);
-    lcd.setCursor(0, 1);
-    lcd.print("brancher batterie");
-    lcd.setCursor(0, 2);
-    lcd.print(F(" attendre bip"));
-    lcd.setCursor(0, 3);
-    lcd.print(F(" et appuyer sur 1"));
-    IR_receiver.resume();
-    while(!IR_receiver.decode(&IR_results)) {Drive.writeMicroseconds(FAST_SPEED);};  // wait for key press
-          
-           Drive.writeMicroseconds(SLOW_SPEED); 
-          
-  delay(5000);
-    }*/
+    /*  if (IR_results.value==IR_CODE_0) {
+        lcd.clear();
+
+        lcd.print(F("config_moteur"));
+        Drive.writeMicroseconds(FAST_SPEED);
+        lcd.setCursor(0, 1);
+        lcd.print("brancher batterie");
+        lcd.setCursor(0, 2);
+        lcd.print(F(" attendre bip"));
+        lcd.setCursor(0, 3);
+        lcd.print(F(" et appuyer sur 1"));
+        IR_receiver.resume();
+        while(!IR_receiver.decode(&IR_results)) {Drive.writeMicroseconds(FAST_SPEED);};  // wait for key press
+
+        Drive.writeMicroseconds(SLOW_SPEED); 
+
+        delay(5000);
+        }*/
     IR_receiver.resume();  // get ready for any additional input
-  #else
+#else
     // if not waiting for user input to start driving, at least give a countdown so they are ready...
 
     lcd.clear();
@@ -319,30 +319,30 @@ pinMode (inv_drive_motor,OUTPUT);
     lcd.setCursor(0, 2);
     for (int i = 10; i > 0; i--)
     {
-      lcd.print(i);
-      lcd.print(F(" "));
-      if (GPS.newNMEAreceived())
-           GPS.parse(GPS.lastNMEA());      
-      delay(500);
+        lcd.print(i);
+        lcd.print(F(" "));
+        if (GPS.newNMEAreceived())
+            GPS.parse(GPS.lastNMEA());      
+        delay(500);
     }
-  #endif
-Serial.print("Location: ");
-      Serial.print(GPS.latitude, 6); Serial.print(GPS.lat);
-      Serial.print(", "); 
-      Serial.print(GPS.longitude, 6); Serial.println(GPS.lon);
-            Serial.print("Location (in degrees, works with Google Maps): ");
-      Serial.print(GPS.latitudeDegrees, 6);
-      Serial.print(", "); 
-      Serial.println(GPS.longitudeDegrees, 6);
-        Serial.println("num sat");
-       Serial.println(GPS.satellites);
-       Serial.println("qualite");
-       Serial.println(GPS.fixquality);
+#endif
+    Serial.print("Location: ");
+    Serial.print(GPS.latitude, 6); Serial.print(GPS.lat);
+    Serial.print(", "); 
+    Serial.print(GPS.longitude, 6); Serial.println(GPS.lon);
+    Serial.print("Location (in degrees, works with Google Maps): ");
+    Serial.print(GPS.latitudeDegrees, 6);
+    Serial.print(", "); 
+    Serial.println(GPS.longitudeDegrees, 6);
+    Serial.println("num sat");
+    Serial.println(GPS.satellites);
+    Serial.println("qualite");
+    Serial.println(GPS.fixquality);
 
-  //
-  // get initial waypoint; also sets the distanceToTarget and courseToTarget varilables
-  nextWaypoint();
- 
+    //
+    // get initial waypoint; also sets the distanceToTarget and courseToTarget varilables
+    nextWaypoint();
+
 } // setup()
 
 
@@ -350,52 +350,52 @@ Serial.print("Location: ");
 
 void loop()
 {
-  
+
     // check for manual kill switch pressed
-    #ifdef USE_IR
-      checkKillSwitch();
-    #endif          
-       
+#ifdef USE_IR
+    checkKillSwitch();
+#endif          
+
     // Process GPS 
     if (GPS.newNMEAreceived())               // check for updated GPS information
-      {  
-  /* Serial.print("Location: ");
-      Serial.print(GPS.latitude, 6); Serial.print(GPS.lat);
-      Serial.print(", "); 
-      Serial.print(GPS.longitude, 6); Serial.println(GPS.lon);
-            Serial.print("Location (in degrees, works with Google Maps): ");
-      Serial.print(GPS.latitudeDegrees, 6);
-      Serial.print(", "); 
-      Serial.println(GPS.longitudeDegrees, 6);
-        Serial.println("num sat");
-       Serial.println(GPS.satellites);
-       Serial.println("qualite");
-       Serial.println(GPS.fixquality);*/
-      
-      
+    {  
+        /* Serial.print("Location: ");
+           Serial.print(GPS.latitude, 6); Serial.print(GPS.lat);
+           Serial.print(", "); 
+           Serial.print(GPS.longitude, 6); Serial.println(GPS.lon);
+           Serial.print("Location (in degrees, works with Google Maps): ");
+           Serial.print(GPS.latitudeDegrees, 6);
+           Serial.print(", "); 
+           Serial.println(GPS.longitudeDegrees, 6);
+           Serial.println("num sat");
+           Serial.println(GPS.satellites);
+           Serial.println("qualite");
+           Serial.println(GPS.fixquality);*/
+
+
         if(GPS.parse(GPS.lastNMEA()) )      // if we successfully parse it, update our data fields
-          processGPS();   
-  /*        Serial.print(F("LAT = "));
-      Serial.print(currentLat);
-      Serial.print(F(" LON = "));
-      Serial.println(currentLong);
-          Serial.println("num sat");
-       Serial.println(GPS.satellites);
-       Serial.println("qualite");
-       Serial.println(GPS.fixquality);*/
-      } 
-  
+            processGPS();   
+        /*        Serial.print(F("LAT = "));
+                  Serial.print(currentLat);
+                  Serial.print(F(" LON = "));
+                  Serial.println(currentLong);
+                  Serial.println("num sat");
+                  Serial.println(GPS.satellites);
+                  Serial.println("qualite");
+                  Serial.println(GPS.fixquality);*/
+    } 
+
     // navigate 
     currentHeading = readCompass();    // get our current heading
     calcDesiredTurn();                // calculate how we would optimatally turn, without regard to obstacles      
-    
+
     // distance in front of us, move, and avoid obstacles as necessary
     checkSonar();
     moveAndAvoid();  
 
     // update display and serial monitor    
     updateDisplay();    
-       
+
 }  // loop()
 
 
@@ -405,18 +405,18 @@ void loop()
 // Called after new GPS data is received; updates our position and course/distance to waypoint
 void processGPS(void)
 {
-  currentLat = convertDegMinToDecDeg(GPS.latitude);
-  currentLong = convertDegMinToDecDeg(GPS.longitude);
-             
-  if (GPS.lat == 'S')            // make them signed
-    currentLat = -currentLat;
-  if (GPS.lon = 'W')  
-    currentLong = -currentLong; 
-             
-  // update the course and distance to waypoint based on our new position
-  distanceToWaypoint();
-  courseToWaypoint();         
-  
+    currentLat = convertDegMinToDecDeg(GPS.latitude);
+    currentLong = convertDegMinToDecDeg(GPS.longitude);
+
+    if (GPS.lat == 'S')            // make them signed
+        currentLat = -currentLat;
+    if (GPS.lon = 'W')  
+        currentLong = -currentLong; 
+
+    // update the course and distance to waypoint based on our new position
+    distanceToWaypoint();
+    courseToWaypoint();         
+
 }   // processGPS(void)
 
 
@@ -424,12 +424,12 @@ void processGPS(void)
 
 void checkSonar(void)
 {   
-  int dist;
+    int dist;
 
-  dist = sonar.ping_in();                   // get distqnce in inches from the sensor
-  if (dist == 0)                                // if too far to measure, return max distance;
+    dist = sonar.ping_in();                   // get distqnce in inches from the sensor
+    if (dist == 0)                                // if too far to measure, return max distance;
     dist = MAX_DISTANCE_IN;  
-  sonarDistance = sonarAverage.add(dist);      // add the new value into moving average, use resulting average
+    sonarDistance = sonarAverage.add(dist);      // add the new value into moving average, use resulting average
 } // checkSonar()
 
 
@@ -437,28 +437,28 @@ void checkSonar(void)
 
 int readCompass(void)
 {
-  compass.getEvent(&compass_event);    
-  float heading = atan2(compass_event.magnetic.y, compass_event.magnetic.x);
-  
-  // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
-  // Find yours here: http://www.magnetic-declination.com/ 
-  // Cedar Park, TX: Magnetic declination: 4° 11' EAST (POSITIVE);  1 degreee = 0.0174532925 radians
-  
-  #define DEC_ANGLE 0.069
-  heading += DEC_ANGLE;
-  
-  // Correct for when signs are reversed.
-  if(heading < 0)
-    heading += 2*PI;
-    
-  // Check for wrap due to addition of declination.
-  if(heading > 2*PI)
-    heading -= 2*PI;
-   
-  // Convert radians to degrees for readability.
-  float headingDegrees = heading * 180/M_PI; 
-  
-  return ((int)headingDegrees); 
+    compass.getEvent(&compass_event);    
+    float heading = atan2(compass_event.magnetic.y, compass_event.magnetic.x);
+
+    // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
+    // Find yours here: http://www.magnetic-declination.com/ 
+    // Cedar Park, TX: Magnetic declination: 4° 11' EAST (POSITIVE);  1 degreee = 0.0174532925 radians
+
+#define DEC_ANGLE 0.069
+    heading += DEC_ANGLE;
+
+    // Correct for when signs are reversed.
+    if(heading < 0)
+        heading += 2*PI;
+
+    // Check for wrap due to addition of declination.
+    if(heading > 2*PI)
+        heading -= 2*PI;
+
+    // Convert radians to degrees for readability.
+    float headingDegrees = heading * 180/M_PI; 
+
+    return ((int)headingDegrees); 
 }  // readCompass()
 
 
@@ -467,23 +467,23 @@ void calcDesiredTurn(void)
 {
     // calculate where we need to turn to head to destination
     headingError = targetHeading - currentHeading;
-    
+
     // adjust for compass wrap
     if (headingError < -180)      
-      headingError += 360;
+        headingError += 360;
     if (headingError > 180)
-      headingError -= 360;
-  
+        headingError -= 360;
+
     // calculate which way to turn to intercept the targetHeading
     if (abs(headingError) <= HEADING_TOLERANCE)      // if within tolerance, don't turn
-      turnDirection = straight;  
+        turnDirection = straight;  
     else if (headingError < 0)
-      turnDirection = left;
+        turnDirection = left;
     else if (headingError > 0)
-      turnDirection = right;
+        turnDirection = right;
     else
-      turnDirection = straight;
- 
+        turnDirection = straight;
+
 }  // calcDesiredTurn()
 
 
@@ -493,126 +493,126 @@ void moveAndAvoid(void)
 {
 
     if (sonarDistance >= SAFE_DISTANCE)       // no close objects in front of car
-        {
-           if (turnDirection == straight)
+    {
+        if (turnDirection == straight)
             spd = FAST_SPEED;
-           //spd=255;
-           else
-           //spd =150;
-           spd = TURN_SPEED;
-           analogWrite(drive_motor, spd);
-           digitalWrite(inv_drive_motor, LOW);
-          // Drive->run(FORWARD);       
-           Direction.write(turnDirection);
-           return;
+        //spd=255;
+        else
+            //spd =150;
+            spd = TURN_SPEED;
+        analogWrite(drive_motor, spd);
+        digitalWrite(inv_drive_motor, LOW);
+        // Drive->run(FORWARD);       
+        Direction.write(turnDirection);
+        return;
+    }
+
+    if (sonarDistance > TURN_DISTANCE && sonarDistance < SAFE_DISTANCE)    // not yet time to turn, but slow down
+    {
+        if (turnDirection == straight)
+            spd = NORMAL_SPEED;
+        else
+        {
+            spd = TURN_SPEED;
+            Direction.write(turnDirection);      // alraedy turning to navigate
         }
-      
-     if (sonarDistance > TURN_DISTANCE && sonarDistance < SAFE_DISTANCE)    // not yet time to turn, but slow down
-       {
-         if (turnDirection == straight)
-           spd = NORMAL_SPEED;
-         else
-           {
-              spd = TURN_SPEED;
-              Direction.write(turnDirection);      // alraedy turning to navigate
-            }
         analogWrite(drive_motor, spd);
         digitalWrite(inv_drive_motor, LOW);
         // driveMotor->run(FORWARD);       
-         return;
-       }
-     
-     if (sonarDistance <  TURN_DISTANCE && sonarDistance > STOP_DISTANCE)  // getting close, time to turn to avoid object        
-        {
-          spd = SLOW_SPEED;
+        return;
+    }
+
+    if (sonarDistance <  TURN_DISTANCE && sonarDistance > STOP_DISTANCE)  // getting close, time to turn to avoid object        
+    {
+        spd = SLOW_SPEED;
         analogWrite(drive_motor, spd);
-           digitalWrite(inv_drive_motor, LOW); // slow down
+        digitalWrite(inv_drive_motor, LOW); // slow down
         //  driveMotor->run(FORWARD); 
-          switch (turnDirection)
-          {
+        switch (turnDirection)
+        {
             case straight:                  // going straight currently, so start new turn
-              {
-                if (headingError <= 0)
-                  turnDirection = left;
-                else
-                  turnDirection = right;
-                Direction.write(turnDirection);  // turn in the new direction
-                break;
-              }
+                {
+                    if (headingError <= 0)
+                        turnDirection = left;
+                    else
+                        turnDirection = right;
+                    Direction.write(turnDirection);  // turn in the new direction
+                    break;
+                }
             case left:                         // if already turning left, try right
-              {
-                Direction.write(TURN_RIGHT);    
-                break;  
-              }
+                {
+                    Direction.write(TURN_RIGHT);    
+                    break;  
+                }
             case right:                       // if already turning right, try left
-              {
-                Direction.write(TURN_LEFT);
-                break;
-              }
-          } // end SWITCH
-          
-         return;
-        }  
+                {
+                    Direction.write(TURN_LEFT);
+                    break;
+                }
+        } // end SWITCH
+
+        return;
+    }  
 
 
-     if (sonarDistance <  STOP_DISTANCE)          // too close, stop and back up
-       {
-       //  Drive.write(RELEASE);            // stop 
-         Direction.write(TURN_STRAIGHT);          // straighten up
-         analogWrite(drive_motor, 0);
-         turnDirection = straight;
-           digitalWrite(inv_drive_motor, HIGH);
-         analogWrite(drive_motor, NORMAL_SPEED);
-         
-         //Drive.write(NORMAL_SPEED);  // go back at higher speet
-         // driveMotor->run(BACKWARD);           
-         while (sonarDistance < TURN_DISTANCE)       // backup until we get safe clearance
-           {
-              if(GPS.parse(GPS.lastNMEA()) )
-                 processGPS();  
-              currentHeading = readCompass();    // get our current heading
-              calcDesiredTurn();                // calculate how we would optimatally turn, without regard to obstacles      
-              checkSonar();
-              updateDisplay();
-              delay(100);
-           } // while (sonarDistance < TURN_DISTANCE)
+    if (sonarDistance <  STOP_DISTANCE)          // too close, stop and back up
+    {
+        //  Drive.write(RELEASE);            // stop 
+        Direction.write(TURN_STRAIGHT);          // straighten up
+        analogWrite(drive_motor, 0);
+        turnDirection = straight;
+        digitalWrite(inv_drive_motor, HIGH);
+        analogWrite(drive_motor, NORMAL_SPEED);
+
+        //Drive.write(NORMAL_SPEED);  // go back at higher speet
+        // driveMotor->run(BACKWARD);           
+        while (sonarDistance < TURN_DISTANCE)       // backup until we get safe clearance
+        {
+            if(GPS.parse(GPS.lastNMEA()) )
+                processGPS();  
+            currentHeading = readCompass();    // get our current heading
+            calcDesiredTurn();                // calculate how we would optimatally turn, without regard to obstacles      
+            checkSonar();
+            updateDisplay();
+            delay(100);
+        } // while (sonarDistance < TURN_DISTANCE)
         // driveMotor->run(RELEASE);        // stop backing up
-         return;
-        } // end of IF TOO CLOSE
-     
+        return;
+    } // end of IF TOO CLOSE
+
 }   // moveAndAvoid()
-    
+
 
 
 
 
 void nextWaypoint(void)
 {
-  waypointNumber++;  lcd.setCursor(0, 1);
-  lcd.clear();
-  lcd.println(F("waypoint n"));
-  lcd.print(waypointNumber);
-  delay(1000);
-  targetLat = waypointList[waypointNumber].getLat();
-  targetLong = waypointList[waypointNumber].getLong();
-  Serial.print("targetlat");
-  Serial.println(targetLat);
+    waypointNumber++;  lcd.setCursor(0, 1);
+    lcd.clear();
+    lcd.println(F("waypoint n"));
+    lcd.print(waypointNumber);
+    delay(1000);
+    targetLat = waypointList[waypointNumber].getLat();
+    targetLong = waypointList[waypointNumber].getLong();
+    Serial.print("targetlat");
+    Serial.println(targetLat);
     Serial.print("targetlong");
-  Serial.println(targetLong);
-  
-  if ((targetLat == 0 && targetLong == 0) || waypointNumber >= NUMBER_WAYPOINTS)    // last waypoint reached? 
+    Serial.println(targetLong);
+
+    if ((targetLat == 0 && targetLong == 0) || waypointNumber >= NUMBER_WAYPOINTS)    // last waypoint reached? 
     {
         analogWrite(drive_motor, 0);//Drive.write(RELEASE);    // make sure we stop
-      Direction.write(TURN_STRAIGHT);  
-      lcd.clear();
-      lcd.println(F("* LAST WAYPOINT *"));
-      loopForever();
+        Direction.write(TURN_STRAIGHT);  
+        lcd.clear();
+        lcd.println(F("* LAST WAYPOINT *"));
+        loopForever();
     }
-    
-   processGPS();
-   distanceToTarget = originalDistanceToTarget = distanceToWaypoint();
-   courseToWaypoint();
-   
+
+    processGPS();
+    distanceToTarget = originalDistanceToTarget = distanceToWaypoint();
+    courseToWaypoint();
+
 }  // nextWaypoint()
 
 
@@ -625,29 +625,29 @@ void nextWaypoint(void)
 // copied from TinyGPS library
 int distanceToWaypoint() 
 {
-  
-  float delta = radians(currentLong - targetLong);
-  float sdlong = sin(delta);
-  float cdlong = cos(delta);
-  float lat1 = radians(currentLat);
-  float lat2 = radians(targetLat);
-  float slat1 = sin(lat1);
-  float clat1 = cos(lat1);
-  float slat2 = sin(lat2);
-  float clat2 = cos(lat2);
-  delta = (clat1 * slat2) - (slat1 * clat2 * cdlong); 
-  delta = sq(delta); 
-  delta += sq(clat2 * sdlong); 
-  delta = sqrt(delta); 
-  float denom = (slat1 * slat2) + (clat1 * clat2 * cdlong); 
-  delta = atan2(delta, denom); 
-  distanceToTarget =  delta * 6372795; 
-   
-  // check to see if we have reached the current waypoint
-  if (distanceToTarget <= WAYPOINT_DIST_TOLERANE)
-    nextWaypoint();
-    
-  return distanceToTarget;
+
+    float delta = radians(currentLong - targetLong);
+    float sdlong = sin(delta);
+    float cdlong = cos(delta);
+    float lat1 = radians(currentLat);
+    float lat2 = radians(targetLat);
+    float slat1 = sin(lat1);
+    float clat1 = cos(lat1);
+    float slat2 = sin(lat2);
+    float clat2 = cos(lat2);
+    delta = (clat1 * slat2) - (slat1 * clat2 * cdlong); 
+    delta = sq(delta); 
+    delta += sq(clat2 * sdlong); 
+    delta = sqrt(delta); 
+    float denom = (slat1 * slat2) + (clat1 * clat2 * cdlong); 
+    delta = atan2(delta, denom); 
+    distanceToTarget =  delta * 6372795; 
+
+    // check to see if we have reached the current waypoint
+    if (distanceToTarget <= WAYPOINT_DIST_TOLERANE)
+        nextWaypoint();
+
+    return distanceToTarget;
 }  // distanceToWaypoint()
 
 
@@ -659,19 +659,19 @@ int distanceToWaypoint()
 // copied from TinyGPS library
 int courseToWaypoint() 
 {
-  float dlon = radians(targetLong-currentLong);
-  float cLat = radians(currentLat);
-  float tLat = radians(targetLat);
-  float a1 = sin(dlon) * cos(tLat);
-  float a2 = sin(cLat) * cos(tLat) * cos(dlon);
-  a2 = cos(cLat) * sin(tLat) - a2;
-  a2 = atan2(a1, a2);
-  if (a2 < 0.0)
-  {
-    a2 += TWO_PI;
-  }
-  targetHeading = degrees(a2);
-  return targetHeading;
+    float dlon = radians(targetLong-currentLong);
+    float cLat = radians(currentLat);
+    float tLat = radians(targetLat);
+    float a1 = sin(dlon) * cos(tLat);
+    float a2 = sin(cLat) * cos(tLat) * cos(dlon);
+    a2 = cos(cLat) * sin(tLat) - a2;
+    a2 = atan2(a1, a2);
+    if (a2 < 0.0)
+    {
+        a2 += TWO_PI;
+    }
+    targetHeading = degrees(a2);
+    return targetHeading;
 }   // courseToWaypoint()
 
 
@@ -680,20 +680,20 @@ int courseToWaypoint()
 
 // converts lat/long from Adafruit degree-minute format to decimal-degrees; requires <math.h> library
 /*double convertDegMinToDecDeg (float degMin) 
-{
+  {
   Serial.println(degMin);
   double min = 0.0;
   double decDeg = 0.0;
- 
-  //get the minutes, fmod() requires double
-  min = fmod((double)degMin, 100.0);
- 
-  //rebuild coordinates in decimal degrees
-  degMin = (int) ( degMin / 100.0 );
-  decDeg = degMin + ( min / 60.0 );
- Serial.println(decDeg);
-  return decDeg;
-  
+
+//get the minutes, fmod() requires double
+min = fmod((double)degMin, 100.0);
+
+//rebuild coordinates in decimal degrees
+degMin = (int) ( degMin / 100.0 );
+decDeg = degMin + ( min / 60.0 );
+Serial.println(decDeg);
+return decDeg;
+
 }*/
 
 // version de clement
@@ -702,7 +702,7 @@ double convertDegMinToDecDeg (float degMin)
     int h = degMin;
     int min = (degMin-h)*100;
     float s = ((degMin-h) - min/100.0)*10000;
-    
+
     double decDeg = h + (min/60.0) + s/3600.0;
     return decDeg;
 }
@@ -716,106 +716,106 @@ double convertDegMinToDecDeg (float degMin)
 void updateDisplay(void)
 {
 
-  static unsigned long lastUpdate = millis();       // for controlling frequency of LCD updates
-  unsigned long currentTime;
+    static unsigned long lastUpdate = millis();       // for controlling frequency of LCD updates
+    unsigned long currentTime;
 
-  // check time since last update
-  currentTime = millis();
-  if (lastUpdate > currentTime)   // check for time wrap around
-    lastUpdate = currentTime;      
+    // check time since last update
+    currentTime = millis();
+    if (lastUpdate > currentTime)   // check for time wrap around
+        lastUpdate = currentTime;      
 
-  if (currentTime >= lastUpdate + 500 )   // limit refresh rate
-  {
-    lastUpdate = currentTime;
+    if (currentTime >= lastUpdate + 500 )   // limit refresh rate
+    {
+        lastUpdate = currentTime;
 
-    // line 1
-    lcd.clear();
-    lcd.print(F("tH= "));
-    lcd.print(targetHeading, DEC);
-    lcd.write(DEGREE_SYMBOL);
-    lcd.print(F(" cH= "));
-    lcd.print(currentHeading, DEC);
-    lcd.write(DEGREE_SYMBOL);
-  
-    // line 2
-    lcd.setCursor(0, 1);
-    lcd.print(F("Err "));
-    if (headingError < 0)
-      lcd.write(LEFT_ARROW);
-    lcd.print(abs(headingError), DEC);
-    if (headingError > 0)
-      lcd.write(RIGHT_ARROW);
-    lcd.print(F(" Dist "));
-    lcd.print(distanceToTarget, DEC);
-    lcd.print(F("m "));
-    #ifdef USE_GRAPHING
-      lcd.write(map(distanceToTarget, 0, originalDistanceToTarget, 0, 7));    // show tiny bar graph of distance remaining
-    #endif
-    
-    // line 3
-    lcd.setCursor(0, 2);
-    lcd.print(F("Snr "));
-    lcd.print(sonarDistance, DEC);
-    #ifdef USE_GRAPHING
-      lcd.write(map(sonarDistance, 0, MAX_DISTANCE_IN, 0, 7));
-    #endif
-    lcd.print(F(" Spd "));
-    lcd.print(spd, DEC);
-    #ifdef USE_GRAPHING
-      lcd.write(map(spd, 0, 255, 0, 7));
-    #endif
-  
-    // line 4
-    lcd.setCursor(0, 3);
-    lcd.print(F("Mem "));
-    lcd.print(freeRam(), DEC);
-    lcd.print(F(" WPT "));
-    lcd.print(waypointNumber + 1, DEC);
-    lcd.print(F(" OF "));
-    lcd.print(NUMBER_WAYPOINTS - 1, DEC);
+        // line 1
+        lcd.clear();
+        lcd.print(F("tH= "));
+        lcd.print(targetHeading, DEC);
+        lcd.write(DEGREE_SYMBOL);
+        lcd.print(F(" cH= "));
+        lcd.print(currentHeading, DEC);
+        lcd.write(DEGREE_SYMBOL);
+
+        // line 2
+        lcd.setCursor(0, 1);
+        lcd.print(F("Err "));
+        if (headingError < 0)
+            lcd.write(LEFT_ARROW);
+        lcd.print(abs(headingError), DEC);
+        if (headingError > 0)
+            lcd.write(RIGHT_ARROW);
+        lcd.print(F(" Dist "));
+        lcd.print(distanceToTarget, DEC);
+        lcd.print(F("m "));
+#ifdef USE_GRAPHING
+        lcd.write(map(distanceToTarget, 0, originalDistanceToTarget, 0, 7));    // show tiny bar graph of distance remaining
+#endif
+
+        // line 3
+        lcd.setCursor(0, 2);
+        lcd.print(F("Snr "));
+        lcd.print(sonarDistance, DEC);
+#ifdef USE_GRAPHING
+        lcd.write(map(sonarDistance, 0, MAX_DISTANCE_IN, 0, 7));
+#endif
+        lcd.print(F(" Spd "));
+        lcd.print(spd, DEC);
+#ifdef USE_GRAPHING
+        lcd.write(map(spd, 0, 255, 0, 7));
+#endif
+
+        // line 4
+        lcd.setCursor(0, 3);
+        lcd.print(F("Mem "));
+        lcd.print(freeRam(), DEC);
+        lcd.print(F(" WPT "));
+        lcd.print(waypointNumber + 1, DEC);
+        lcd.print(F(" OF "));
+        lcd.print(NUMBER_WAYPOINTS - 1, DEC);
 
 
-     #ifdef DEBUG
-      //Serial.print("GPS Fix:");
-      //Serial.println((int)GPS.fix);
-      Serial.print(F("LAT = "));
-      Serial.print(currentLat);
-      Serial.print(F(" LON = "));
-      Serial.println(currentLong);
-      Serial.print("Waypint LAT ="); 
-      Serial.print(waypointList[waypointNumber].getLat());
-      Serial.print(F(" Long = "));
-      Serial.print(waypointList[waypointNumber].getLong());
-      Serial.print(F(" Dist "));
-      Serial.print(distanceToWaypoint());
-      Serial.print(F("Original Dist "));
-      Serial.println(originalDistanceToTarget);
-      Serial.print(F("Compass Heading "));
-      Serial.println(currentHeading);
-      Serial.print(F("GPS Heading "));
-      Serial.println(GPS.angle);
-      Serial.println("num sat");
-       Serial.println(GPS.satellites);
-       Serial.println("qualite");
-       Serial.println(GPS.fixquality);
-      
-      //Serial.println(GPS.lastNMEA());
-     
-      //Serial.print(F("Sonar = "));
-      //Serial.print(sonarDistance, DEC);
-      //Serial.print(F(" Spd = "));
-      //Serial.println(speed, DEC);
-      //Serial.print(F("  Target = "));
-      //Serial.print(targetHeading, DEC);
-      //Serial.print(F("  Current = "));
-      //Serial.print(currentHeading, DEC);
-      //Serial.print(F("  Error = "));
-      //Serial.println(headingError, DEC);
-      //Serial.print(F("Free Memory: "));
-      //Serial.println(freeRam(), DEC);
-     #endif
+#ifdef DEBUG
+        //Serial.print("GPS Fix:");
+        //Serial.println((int)GPS.fix);
+        Serial.print(F("LAT = "));
+        Serial.print(currentLat);
+        Serial.print(F(" LON = "));
+        Serial.println(currentLong);
+        Serial.print("Waypint LAT ="); 
+        Serial.print(waypointList[waypointNumber].getLat());
+        Serial.print(F(" Long = "));
+        Serial.print(waypointList[waypointNumber].getLong());
+        Serial.print(F(" Dist "));
+        Serial.print(distanceToWaypoint());
+        Serial.print(F("Original Dist "));
+        Serial.println(originalDistanceToTarget);
+        Serial.print(F("Compass Heading "));
+        Serial.println(currentHeading);
+        Serial.print(F("GPS Heading "));
+        Serial.println(GPS.angle);
+        Serial.println("num sat");
+        Serial.println(GPS.satellites);
+        Serial.println("qualite");
+        Serial.println(GPS.fixquality);
 
-  } //  if (currentTime >= lastUpdate + 500 )
+        //Serial.println(GPS.lastNMEA());
+
+        //Serial.print(F("Sonar = "));
+        //Serial.print(sonarDistance, DEC);
+        //Serial.print(F(" Spd = "));
+        //Serial.println(speed, DEC);
+        //Serial.print(F("  Target = "));
+        //Serial.print(targetHeading, DEC);
+        //Serial.print(F("  Current = "));
+        //Serial.print(currentHeading, DEC);
+        //Serial.print(F("  Error = "));
+        //Serial.println(headingError, DEC);
+        //Serial.print(F("Free Memory: "));
+        //Serial.println(freeRam(), DEC);
+#endif
+
+    } //  if (currentTime >= lastUpdate + 500 )
 
 }  // updateDisplay()  
 
@@ -824,12 +824,12 @@ void updateDisplay(void)
 //
 // Display free memory available
 //#ifdef DEBUG
-  int freeRam ()   // display free memory (SRAM)
-    {
-      extern int __heap_start, *__brkval; 
-      int v; 
-      return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-  } // freeRam()
+int freeRam ()   // display free memory (SRAM)
+{
+    extern int __heap_start, *__brkval; 
+    int v; 
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+} // freeRam()
 //#endif
 
 
@@ -838,8 +838,8 @@ void updateDisplay(void)
 // end of program routine, loops forever
 void loopForever(void)
 {
-  while (1)
-    ;
+    while (1)
+        ;
 }
 
 
@@ -848,24 +848,24 @@ void loopForever(void)
 // 
 // Graphing (mini-inline bar graph for LCD display)
 #ifdef USE_GRAPHING
-  void createLCDChars(void)
-    {
+void createLCDChars(void)
+{
     int lvl = 0;
     byte arry[8];
     for (int a = 7; a >= 0; a--)
-      {
-      for (int b = 0; b <= 7; b++)
-      {
-          if (b >= lvl)
-            arry[b] = B11111;       // solid
-          else
-            //arry[b] = B00000;     // blank row
-            arry[b] = B10001;       // hollow but with sides
-       }
-      lcd.createChar(a, arry);
-      lvl++;
+    {
+        for (int b = 0; b <= 7; b++)
+        {
+            if (b >= lvl)
+                arry[b] = B11111;       // solid
+            else
+                //arry[b] = B00000;     // blank row
+                arry[b] = B10001;       // hollow but with sides
+        }
+        lcd.createChar(a, arry);
+        lvl++;
     }
-  } // createLCDChars(void)
+} // createLCDChars(void)
 #endif
 
 
@@ -874,24 +874,24 @@ void loopForever(void)
 //
 // Implement an IR "kill switch" if selected in configuration options
 #ifdef USE_IR
-  void checkKillSwitch(void)
-  {
+void checkKillSwitch(void)
+{
     if(IR_receiver.decode(&IR_results))     // check for manual "kill switch"
-        {
+    {
         analogWrite(drive_motor,0); 
         digitalWrite(inv_drive_motor,LOW);
         Direction.write(TURN_STRAIGHT);              
-         // Drive.write (RELEASE);              
-     
-          lcd.clear(); 
-          lcd.print(F("Press to resume"));
-          delay(1000); 
-     
-          IR_receiver.resume();  
-          while(!IR_receiver.decode(&IR_results)) ;  // wait for key press
-          IR_receiver.resume();  // get ready for any additional input
-        }
-  }  // checkKillSwitch()
+        // Drive.write (RELEASE);              
+
+        lcd.clear(); 
+        lcd.print(F("Press to resume"));
+        delay(1000); 
+
+        IR_receiver.resume();  
+        while(!IR_receiver.decode(&IR_results)) ;  // wait for key press
+        IR_receiver.resume();  // get ready for any additional input
+    }
+}  // checkKillSwitch()
 #endif
 
 
