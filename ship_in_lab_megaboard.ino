@@ -83,7 +83,7 @@ LiquidCrystal_I2C lcd(0x20, 20, 4);  // Set the LCD I2C address and size (4x20)
 //PString message(lcd_buffer, sizeof(lcd_buffer));    // holds message we display on line 4 of LCD
 
 // drive_motor
-const int drive_motor= 9;
+const int drive_motor= 3;
 const int inv_drive_motor=4;
 
 
